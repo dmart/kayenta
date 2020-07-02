@@ -18,6 +18,8 @@ package com.netflix.kayenta.datadog.canary;
 
 import com.netflix.kayenta.canary.CanaryScope;
 import com.netflix.kayenta.canary.CanaryScopeFactory;
+import java.util.Collections;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,7 +30,22 @@ public class DatadogCanaryScopeFactory implements CanaryScopeFactory {
   }
 
   @Override
-  public CanaryScope buildCanaryScope(CanaryScope scope) {
-    return scope;
+  public CanaryScope buildCanaryScope(CanaryScope canaryScope) {
+    DatadogCanaryScope datadogCanaryScope = new DatadogCanaryScope();
+    datadogCanaryScope.setScope(canaryScope.getScope());
+    datadogCanaryScope.setLocation(canaryScope.getLocation());
+    datadogCanaryScope.setStart(canaryScope.getStart());
+    datadogCanaryScope.setEnd(canaryScope.getEnd());
+    datadogCanaryScope.setStep(canaryScope.getStep());
+    datadogCanaryScope.setExtendedScopeParams(canaryScope.getExtendedScopeParams());
+
+    Map<String, String> extendedScopeParams = datadogCanaryScope.getExtendedScopeParams();
+    if (extendedScopeParams == null) {
+      extendedScopeParams = Collections.emptyMap();
+    }
+
+    datadogCanaryScope.setResourceType(extendedScopeParams.getOrDefault("resourceType", "group"));
+
+    return datadogCanaryScope;
   }
 }

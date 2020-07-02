@@ -19,9 +19,7 @@ package com.netflix.kayenta.datadog.config;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * This configuration class allows you to specify default values for the PrometheusFetchController.
- */
+/** This configuration class allows you to specify default values for the DatadogFetchController. */
 public class DatadogConfigurationTestControllerDefaultProperties {
 
   @Getter @Setter private String scope;
@@ -29,4 +27,6 @@ public class DatadogConfigurationTestControllerDefaultProperties {
   @Getter @Setter private String start;
 
   @Getter @Setter private String end;
+
+  @Getter @Setter private String resourceType;
 }

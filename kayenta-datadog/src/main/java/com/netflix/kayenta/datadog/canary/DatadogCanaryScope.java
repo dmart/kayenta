@@ -24,4 +24,6 @@ import lombok.ToString;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class DatadogCanaryScope extends CanaryScope {}
+public class DatadogCanaryScope extends CanaryScope {
+  private String resourceType;
+}

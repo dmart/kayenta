@@ -21,6 +21,7 @@ import static com.netflix.kayenta.canary.util.FetchControllerUtils.determineDefa
 import com.netflix.kayenta.canary.CanaryMetricConfig;
 import com.netflix.kayenta.canary.CanaryScope;
 import com.netflix.kayenta.canary.providers.metrics.DatadogCanaryMetricSetQueryConfig;
+import com.netflix.kayenta.datadog.canary.DatadogCanaryScopeFactory;
 import com.netflix.kayenta.datadog.config.DatadogConfigurationTestControllerDefaultProperties;
 import com.netflix.kayenta.metrics.SynchronousQueryProcessor;
 import com.netflix.kayenta.security.AccountCredentials;
@@ -31,10 +32,7 @@ import java.time.Instant;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/fetch/datadog")
@@ -72,6 +70,7 @@ public class DatadogFetchController {
       @ApiParam(value = "An ISO format timestamp, e.g.: 2018-03-15T01:23:45Z")
           @RequestParam(required = false)
           String end,
+      @ApiParam @RequestBody final Map<String, String> extendedScopeParams,
       @ApiParam(defaultValue = "false") @RequestParam(required = false) final boolean dryRun)
       throws IOException {
     // Apply defaults.
@@ -106,13 +105,17 @@ public class DatadogFetchController {
     canaryScope.setStart(start != null ? Instant.parse(start) : null);
     canaryScope.setEnd(end != null ? Instant.parse(end) : null);
 
+    canaryScope.setExtendedScopeParams(extendedScopeParams);
+
+    CanaryScope datadogCanaryScope = new DatadogCanaryScopeFactory().buildCanaryScope(canaryScope);
+
     return synchronousQueryProcessor.processQueryAndReturnMap(
         resolvedMetricsAccountName,
         resolvedStorageAccountName,
         null,
         canaryMetricConfig,
         0,
-        canaryScope,
+        datadogCanaryScope,
         dryRun);
   }
 }

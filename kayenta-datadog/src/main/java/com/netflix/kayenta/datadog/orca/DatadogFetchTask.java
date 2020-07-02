@@ -19,6 +19,7 @@ package com.netflix.kayenta.datadog.orca;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.kayenta.canary.CanaryConfig;
 import com.netflix.kayenta.canary.CanaryScope;
+import com.netflix.kayenta.datadog.canary.DatadogCanaryScope;
 import com.netflix.kayenta.metrics.SynchronousQueryProcessor;
 import com.netflix.kayenta.security.AccountCredentials;
 import com.netflix.kayenta.security.AccountCredentialsRepository;
@@ -69,7 +70,7 @@ public class DatadogFetchTask implements RetryableTask {
     try {
       canaryScope =
           kayentaObjectMapper.readValue(
-              (String) stage.getContext().get("canaryScope"), CanaryScope.class);
+              (String) stage.getContext().get("canaryScope"), DatadogCanaryScope.class);
     } catch (IOException e) {
       log.warn("Unable to parse JSON scope", e);
       throw new RuntimeException(e);

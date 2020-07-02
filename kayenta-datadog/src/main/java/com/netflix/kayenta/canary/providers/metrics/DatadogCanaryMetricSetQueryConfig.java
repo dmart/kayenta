@@ -40,6 +40,8 @@ public class DatadogCanaryMetricSetQueryConfig implements CanaryMetricSetQueryCo
 
   @Getter private String customFilterTemplate;
 
+  @Getter private String resourceType;
+
   @Override
   public CanaryMetricSetQueryConfig cloneWithEscapedInlineTemplate() {
     if (StringUtils.isEmpty(customInlineTemplate)) {

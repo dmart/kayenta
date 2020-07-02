@@ -21,6 +21,7 @@ import com.netflix.kayenta.canary.CanaryMetricConfig;
 import com.netflix.kayenta.canary.CanaryScope;
 import com.netflix.kayenta.canary.providers.metrics.DatadogCanaryMetricSetQueryConfig;
 import com.netflix.kayenta.canary.providers.metrics.QueryConfigUtils;
+import com.netflix.kayenta.datadog.canary.DatadogCanaryScope;
 import com.netflix.kayenta.datadog.security.DatadogCredentials;
 import com.netflix.kayenta.datadog.security.DatadogNamedAccountCredentials;
 import com.netflix.kayenta.datadog.service.DatadogRemoteService;
@@ -83,12 +84,29 @@ public class DatadogMetricsService implements MetricsService {
         (DatadogCanaryMetricSetQueryConfig) canaryMetricConfig.getQuery();
     String[] baseScopeAttributes = new String[] {"scope", "location"};
 
+    DatadogCanaryScope datadogCanaryScope = (DatadogCanaryScope) canaryScope;
+
     String customFilter =
         QueryConfigUtils.expandCustomFilter(
             canaryConfig, queryConfig, canaryScope, baseScopeAttributes);
 
     if (StringUtils.isEmpty(customFilter)) {
-      return queryConfig.getMetricName() + "{" + canaryScope.getScope() + "}";
+      String resourceType = datadogCanaryScope.getResourceType();
+      String scope = datadogCanaryScope.getScope();
+      String location = datadogCanaryScope.getLocation();
+
+      List<String> params = new ArrayList<>();
+
+      if (location != null && !location.isEmpty()) {
+        params.add(String.join(":", "region", location));
+      }
+
+      if (resourceType != null && !resourceType.isEmpty()) {
+        scope = String.join(":", resourceType, scope);
+      }
+      params.add(scope);
+
+      return queryConfig.getMetricName() + "{" + String.join(",", params) + "}";
     } else {
       return customFilter;
     }
